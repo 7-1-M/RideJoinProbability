@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <title>TG Ride Probability Calculator</title>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #ffffff;
+            --text: #111111;
+            --fieldset: #f5f5f5;
+            --border: #cccccc;
+            --input-bg: #ffffff;
+            --result: #000000;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0f1115;
+                --text: #e6e6e6;
+                --fieldset: #1a1d24;
+                --border: #333845;
+                --input-bg: #151821;
+                --result: #ffffff;
+            }
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: auto;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        fieldset {
+            margin-bottom: 15px;
+            background: var(--fieldset);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+
+        label {
+            display: block;
+            margin-top: 8px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 6px;
+            background: var(--input-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #4ea1ff;
+        }
+
+        .result {
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-align: center;
+            color: var(--result);
+        }
+
+        .emoji {
+            font-size: 48px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .small {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .header {
+            margin: 20px 0;
+            padding: 24px;
+            border-radius: 14px;
+            text-align: center;
+            background: linear-gradient(135deg, #888, #555);
+            color: white;
+            transition: background 0.6s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .header-title {
+            font-size: 16px;
+            opacity: 0.85;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .header-value {
+            font-size: 42px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        .header-emoji {
+            font-size: 52px;
+            margin-top: 6px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .header {
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            }
+        }
+
+        #reasons {
+            display: none;
+            margin-top: 20px;
+            border-radius: 12px;
+            background: var(--fieldset);
+            border: 1px solid var(--border);
+            padding: 16px 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        #reasons legend {
+            font-weight: bold;
+            font-size: 16px;
+            padding: 0 10px;
+        }
+
+        #reasonList {
+            list-style: none;
+            /* remove default bullets */
+            margin: 10px 0 0 0;
+            padding: 0;
+        }
+
+        #reasonList li {
+            margin: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        #reasonList li::before {
+            content: "⚠️";
+            /* or any emoji you like */
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            fieldset {
+                padding: 12px 10px;
+            }
+
+            input,
+            select,
+            textarea {
+                font-size: 16px;
+                padding: 10px;
+            }
+
+            .header {
+                padding: 20px 16px;
+                border-radius: 12px;
+            }
+
+            .header-title {
+                font-size: 14px;
+            }
+
+            .header-value {
+                font-size: 36px;
+            }
+
+            .header-emoji {
+                font-size: 42px;
+            }
+
+            #reasonList li {
+                font-size: 15px;
+                padding-left: 28px;
+            }
+
+            #reasonList li::before {
+                font-size: 18px;
+                top: 1px;
+            }
+        }
+
+        input[type="date"],
+        input[type="time"] {
+            width: 100%;
+            max-width: 100%;
+            padding: 5px 0px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div id="header" class="header">
+        <div class="header-content">
+            <div class="header-title">Join Probability</div>
+            <div class="header-value" id="result">—</div>
+            <div class="header-emoji" id="emoji">🤔</div>
+        </div>
+
+        <div id="reasons" style="display:none;">
+            <fieldset>
+                <legend>Why TG might skip this ride</legend>
+                <ul id="reasonList"></ul>
+            </fieldset>
+        </div>
+
+    </div>
+
+    <form id="rideForm">
+
+        <fieldset>
+            <legend>Date & Time</legend>
+            <label>Date
+                <input type="date" id="date">
+            </label>
+
+            <label>Start Time
+                <input type="time" id="startTime" value="11:30">
+            </label>
+
+            <label>End Time
+                <input type="time" id="endTime" value="15:30">
+            </label>
+        </fieldset>
+
+        <fieldset>
+            <legend>Weather</legend>
+            <label>Chance of Rain (%)
+                <input type="number" id="rain" min="0" max="100" value="10">
+            </label>
+
+            <label>Chance of Fog (%)
+                <input type="number" id="fog" min="0" max="100" value="10">
+            </label>
+
+            <label>Lowest Temperature on Ride (°C)
+                <input type="number" id="temp" value="0">
+            </label>
+
+            <label>Wind Speed (km/h)
+                <input type="number" id="wind" value="0">
+            </label>
+        </fieldset>
+
+        <fieldset>
+            <legend>Route</legend>
+            <label>Max Gradient (%)
+                <input type="number" id="gradient" value="10">
+            </label>
+        </fieldset>
+
+        <fieldset>
+            <legend>Group Composition</legend>
+            <label>Riders (one per line: Name Surname FTP)
+                <textarea id="riders" rows="4">Alex Rider 280</textarea>
+            </label>
+        </fieldset>
+
+        <fieldset>
+            <legend>TG Training Volume</legend>
+            <select id="training">
+                <option value="1.1">Low</option>
+                <option value="1.0" selected>Normal</option>
+                <option value="0.9">High</option>
+                <option value="0.9">Very High</option>
+            </select>
+        </fieldset>
+
+    </form>
+
+    <script>
+        function clamp(v, min, max) {
+            return Math.max(min, Math.min(max, v));
+        }
+
+        function calculate() {
+            let reasons = [];
+            let p = 1.0;
+
+            // Date logic
+            const dateVal = document.getElementById("date").value;
+            if (dateVal) {
+                const day = new Date(dateVal).getDay();
+                if (day >= 1 && day <= 5) {
+                    p *= 0.5;
+                    reasons.push("Weekday ride");
+                }
+            }
+
+
+            // Time & length
+            const start = document.getElementById("startTime").value;
+            const end = document.getElementById("endTime").value;
+            if (start && end) {
+                const s = new Date(`1970-01-01T${start}`);
+                const e = new Date(`1970-01-01T${end}`);
+                const hours = (e - s) / 36e5;
+
+
+                if (hours < 2 || hours > 5) {
+                    p *= 0.7;
+                    reasons.push("Ride duration outside ideal 2–5 hours");
+                }
+
+                const sh = s.getHours() + s.getMinutes() / 60;
+                if (sh < 11 || sh > 13) {
+                    p *= 0.8;
+                    reasons.push("Start time not in optimal window (11:00–13:00)");
+                }
+            }
+
+            // Weather
+            const rain = document.getElementById("rain").value / 100;
+            const fog = document.getElementById("fog").value / 100;
+            if (rain > 0.2) reasons.push(`Rain chance ${Math.round(rain * 100)}%`);
+            if (fog > 0.3) reasons.push(`Fog chance ${Math.round(fog * 100)}%`);
+            p *= (1 - rain * 0.7);
+            p *= (1 - fog * 0.7);
+
+
+            // Temperature
+            const temp = document.getElementById("temp").value;
+            if (temp < 0) reasons.push("Below freezing temperatures expected");
+            else if (temp > 40) reasons.push("Extremely high temperatures expected");
+
+            if (temp < 10 || temp > 30) p *= 0.8;
+            if (temp < 0 || temp > 40) p *= 0.5;
+
+            // Wind
+            const wind = document.getElementById("wind").value;
+            if (wind > 15) p *= 0.85;
+            else if (wind > 30) p *= 0.6;
+            if (wind > 15) reasons.push("Windy conditions");
+            else if (wind > 30) reasons.push("Very strong wind");
+
+
+            // Gradient hard cutoff
+            const gradient = document.getElementById("gradient").value;
+            if (gradient > 15) {
+                p = 0;
+                reasons.push("Max gradient over 15% (absolute deal breaker)");
+            }
+
+            // Riders
+            const ridersText = document.getElementById("riders").value.toLowerCase();
+            const riders = ridersText.split("\n").filter(r => r.trim());
+            const size = riders.length;
+
+            if (size > 8) p *= 0.9;
+            if (ridersText.includes("noah")) {
+                p *= 0.5;
+                reasons.push("Chance of Noah participating.");
+            }
+            if (ridersText.includes("emanuel")) {
+                if (riders == 1) p = 1;
+                else p *= 1.1;
+            }
+
+            if (size > 8) reasons.push("Group too large");
+
+            // Training volume
+            p *= parseFloat(document.getElementById("training").value);
+
+            p = clamp(p, 0, 1);
+
+            const percent = (p * 100).toFixed(1);
+            document.getElementById("result").innerText = `${percent}%`;
+
+            let emoji = "🤔";
+            let background = "linear-gradient(135deg, #777, #555)";
+
+            if (p === 0) {
+                emoji = "☠️";
+                background = "linear-gradient(135deg, #000000, #434343)";
+            } else if (p < 0.15) {
+                emoji = "🤮";
+                background = "linear-gradient(135deg, #8b0000, #ff2e2e)";
+            } else if (p < 0.3) {
+                emoji = "💩";
+                background = "linear-gradient(135deg, #7a3e00, #c56b00)";
+            } else if (p < 0.5) {
+                emoji = "😬";
+                background = "linear-gradient(135deg, #ff8c00, #ffc04d)";
+            } else if (p < 0.7) {
+                emoji = "🙂";
+                background = "linear-gradient(135deg, #3a9bdc, #67c7ff)";
+            } else if (p < 0.85) {
+                emoji = "😎";
+                background = "linear-gradient(135deg, #2ecc71, #27ae60)";
+            } else {
+                emoji = "🔥";
+                background = "linear-gradient(135deg, #00c853, #b2ff59)";
+            }
+
+            document.getElementById("emoji").innerText = emoji;
+            document.getElementById("header").style.background = background;
+
+            const reasonBox = document.getElementById("reasons");
+            const list = document.getElementById("reasonList");
+            list.innerHTML = "";
+
+            if (p < 0.7 && reasons.length > 0) {
+                reasons.forEach(r => {
+                    const li = document.createElement("li");
+                    li.textContent = r;
+                    list.appendChild(li);
+                });
+                reasonBox.style.display = "block";
+            } else {
+                reasonBox.style.display = "none";
+            }
+
+        }
+
+        // Live calculation
+        document.querySelectorAll("input, select, textarea")
+            .forEach(el => el.addEventListener("input", calculate));
+
+        // Set initial date to today
+        const dateInput = document.getElementById("date");
+        const today = new Date().toISOString().split("T")[0];
+        dateInput.value = today;
+
+        // Initial run
+        calculate();
+    </script>
+
+    <script>
+        // Helper to parse URL parameters
+        function getUrlParams() {
+            const params = {};
+            window.location.search.substring(1).split("&").forEach(pair => {
+                if (!pair) return;
+                const [key, value] = pair.split("=");
+                if (key) {
+                    params[decodeURIComponent(key)] = decodeURIComponent(value.replace(/\+/g, " "));
+                }
+            });
+            return params;
+        }
+
+        // Fill inputs from URL
+        function fillFromUrl() {
+            const params = getUrlParams();
+
+            if (params.date) document.getElementById("date").value = params.date;
+            if (params.startTime) document.getElementById("startTime").value = params.startTime;
+            if (params.endTime) document.getElementById("endTime").value = params.endTime;
+            if (params.rain) document.getElementById("rain").value = params.rain;
+            if (params.fog) document.getElementById("fog").value = params.fog;
+            if (params.temp) document.getElementById("temp").value = params.temp;
+            if (params.wind) document.getElementById("wind").value = params.wind;
+            if (params.gradient) document.getElementById("gradient").value = params.gradient;
+            if (params.riders) document.getElementById("riders").value = params.riders;
+            if (params.training) document.getElementById("training").value = params.training;
+        }
+
+        // Call on page load
+        fillFromUrl();
+    </script>
+
+
+</body>
+
+</html>
