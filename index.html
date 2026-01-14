@@ -456,11 +456,6 @@
         const today = new Date().toISOString().split("T")[0];
         dateInput.value = today;
 
-        // Initial run
-        calculate();
-    </script>
-
-    <script>
         // Helper to parse URL parameters
         function getUrlParams() {
             const params = {};
@@ -492,9 +487,10 @@
 
         // Call on page load
         fillFromUrl();
+
+        // Initial run
+        calculate();
     </script>
-
-
 </body>
 
 </html>
