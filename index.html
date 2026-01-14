@@ -389,6 +389,11 @@
         document.querySelectorAll("input, select, textarea")
             .forEach(el => el.addEventListener("input", calculate));
 
+          // Set initial date to today
+        const dateInput = document.getElementById("date");
+        const today = new Date().toISOString().split("T")[0];
+        dateInput.value = today;
+        
         // Initial run
         calculate();
     </script>
