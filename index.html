@@ -157,6 +157,51 @@
             font-size: 16px;
             line-height: 1.4;
         }
+
+        /* Mobile Optimization */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            fieldset {
+                padding: 12px 10px;
+            }
+
+            input,
+            select,
+            textarea {
+                font-size: 16px;
+                padding: 10px;
+            }
+
+            .header {
+                padding: 20px 16px;
+                border-radius: 12px;
+            }
+
+            .header-title {
+                font-size: 14px;
+            }
+
+            .header-value {
+                font-size: 36px;
+            }
+
+            .header-emoji {
+                font-size: 42px;
+            }
+
+            #reasonList li {
+                font-size: 15px;
+                padding-left: 28px;
+            }
+
+            #reasonList li::before {
+                font-size: 18px;
+                top: 1px;
+            }
+        }
     </style>
 
 </head>
@@ -324,7 +369,7 @@
                 p *= 0.5;
                 reasons.push("Chance of Noah participating.");
             }
-            if (ridersText.includes("emanuel"))  {
+            if (ridersText.includes("emanuel")) {
                 if (riders == 1) p = 1;
                 else p *= 1.1;
             }
@@ -389,11 +434,11 @@
         document.querySelectorAll("input, select, textarea")
             .forEach(el => el.addEventListener("input", calculate));
 
-          // Set initial date to today
+        // Set initial date to today
         const dateInput = document.getElementById("date");
         const today = new Date().toISOString().split("T")[0];
         dateInput.value = today;
-        
+
         // Initial run
         calculate();
     </script>
