@@ -460,6 +460,41 @@
         calculate();
     </script>
 
+    <script>
+        // Helper to parse URL parameters
+        function getUrlParams() {
+            const params = {};
+            window.location.search.substring(1).split("&").forEach(pair => {
+                if (!pair) return;
+                const [key, value] = pair.split("=");
+                if (key) {
+                    params[decodeURIComponent(key)] = decodeURIComponent(value.replace(/\+/g, " "));
+                }
+            });
+            return params;
+        }
+
+        // Fill inputs from URL
+        function fillFromUrl() {
+            const params = getUrlParams();
+
+            if (params.date) document.getElementById("date").value = params.date;
+            if (params.startTime) document.getElementById("startTime").value = params.startTime;
+            if (params.endTime) document.getElementById("endTime").value = params.endTime;
+            if (params.rain) document.getElementById("rain").value = params.rain;
+            if (params.fog) document.getElementById("fog").value = params.fog;
+            if (params.temp) document.getElementById("temp").value = params.temp;
+            if (params.wind) document.getElementById("wind").value = params.wind;
+            if (params.gradient) document.getElementById("gradient").value = params.gradient;
+            if (params.riders) document.getElementById("riders").value = params.riders;
+            if (params.training) document.getElementById("training").value = params.training;
+        }
+
+        // Call on page load
+        fillFromUrl();
+    </script>
+
+
 </body>
 
 </html>
